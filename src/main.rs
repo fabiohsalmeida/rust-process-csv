@@ -1,7 +1,12 @@
 mod csv_interactor;
 
+use std::env;
 use csv::Error;
 
 fn main() -> Result<(), Error> {
-    return csv_interactor::read_csv("test.csv");
+    let args: Vec<String> = env::args().collect();
+
+    let file_path = &args[1];
+
+    return csv_interactor::read_csv(file_path);
 }
