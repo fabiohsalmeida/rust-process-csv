@@ -1,4 +1,6 @@
+mod payment_record;
 mod csv_interactor;
+mod provider;
 
 use std::env;
 use csv::Error;
