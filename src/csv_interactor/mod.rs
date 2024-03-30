@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
+use csv::Writer;
+
 use crate::payment_record::PaymentRecord;
 use crate::provider::Institution;
+use crate::report::ItpReport;
 
 pub const PROVIDER_LIST_PATH_FILE: &str = "list_providers.csv";
 
@@ -46,4 +49,14 @@ pub(crate) fn load_institutions() -> HashMap<String, Institution> {
     );
 
     institutions
+}
+
+pub(crate) fn write_report_to_csv(report_list: Vec<ItpReport>) {
+    let mut wtr = Writer::from_path("itp_report.csv").unwrap();
+
+    for report in report_list {
+        wtr.serialize(report).expect("Something went wrong in the serialization to report");
+    }
+
+    wtr.flush().unwrap();
 }

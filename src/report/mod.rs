@@ -15,30 +15,31 @@ const HTTP_METHOD_POST: &str = "POST";
 const HTTP_METHOD_PATCH: &str = "PATCH";
 const EMPTY: &str = "";
 
+#[derive(serde::Serialize)]
 pub struct ItpReport {
-    // #[serde(rename = "Iniciador")]
+    #[serde(rename = "Iniciador")]
     pub initiator_institution: String,
-    // #[serde(rename = "Detentora")]
+    #[serde(rename = "Detentora")]
     pub account_holder_institution: String,
-    // #[serde(rename = "API")]
+    #[serde(rename = "API")]
     pub api: String,
-    // #[serde(rename = "Endpoint")]
+    #[serde(rename = "Endpoint")]
     pub endpoint_description: String,
-    // #[serde(rename = "Método")]
+    #[serde(rename = "Método")]
     pub http_method: String,
-    // #[serde(rename = "Status")]
+    #[serde(rename = "Status")]
     pub http_status: i16,
-    // #[serde(rename = "Quantidade")]
+    #[serde(rename = "Quantidade")]
     pub quantity: i32,
-    // #[serde(rename = "Versão da API")]
+    #[serde(rename = "Versão da API")]
     pub api_version: String,
-    // #[serde(rename = "OrganizationId Iniciador")]
+    #[serde(rename = "OrganizationId Iniciador")]
     pub initiator_organization_id: String,
-    // #[serde(rename = "OrganizationId Detentor")]
+    #[serde(rename = "OrganizationId Detentor")]
     pub account_holder_organization_id: String,
-    // #[serde(rename = "ParentOrganizationReference Detentor")]
+    #[serde(rename = "ParentOrganizationReference Detentor")]
     pub account_holder_parent_organization_document: String,
-    // #[serde(rename = "URI do endpoint")]
+    #[serde(rename = "URI do endpoint")]
     pub endpoint_uri: String
 }
 
@@ -91,5 +92,4 @@ impl ItpReport {
 
         endpoint_description.parse().unwrap()
     }
-
 }
