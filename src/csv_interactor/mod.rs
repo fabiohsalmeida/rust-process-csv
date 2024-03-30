@@ -1,34 +1,48 @@
-use csv::{Error};
-use crate::payment_record::PaymentRecord;
+use std::collections::HashMap;
 
-pub(crate) fn read_csv(filename: &str) -> Result<(), Error> {
+use crate::payment_record::PaymentRecord;
+use crate::provider::Institution;
+
+pub(crate) fn read_csv_payments_input(filename: &str) -> Vec<PaymentRecord> {
     let reader = csv::Reader::from_path(filename);
-    let mut number_of_payments: i8 = 0;
+    let mut payment_inputs: Vec<PaymentRecord> = Vec::new();
 
     for record in reader.unwrap().records() {
-        let record = record?;
-
+        let record = record.unwrap();
         let payment_record = PaymentRecord::new(record);
 
-        println!(
-            "Time: {}, Version: {}, Host: {}, Method: {}, Path: {}, Status_Code: {}, Provider: {}, Quantity: {}",
-            payment_record.time,
-            payment_record.api_version,
-            payment_record.http_host,
-            payment_record.http_method,
-            payment_record.http_path,
-            payment_record.http_status_code,
-            payment_record.provider_id,
-            payment_record.quantity
-        );
-
-        number_of_payments += 1;
+        payment_inputs.push(payment_record);
     }
 
     println!(
-        "Number of Payments: {}",
-        number_of_payments
+        "Number of Payments from input in {}: {}",
+        filename,
+        payment_inputs.len()
     );
 
-    Ok(())
+    payment_inputs
+}
+
+pub(crate) fn load_institutions() -> HashMap<String, Institution> {
+    let provider_list_path_file = "list_providers.csv";
+    let reader = csv::Reader::from_path(provider_list_path_file);
+    let mut institutions = HashMap::new();
+
+    for record in reader.unwrap().records() {
+        let record = record.unwrap();
+        let institution = Institution::new(record);
+
+        institutions.insert(
+            institution.provider_id.to_string(),
+            institution
+        );
+    }
+
+    println!(
+        "Number of Institutions loaded in {}: {}",
+        provider_list_path_file,
+        institutions.len()
+    );
+
+    institutions
 }
