@@ -41,3 +41,32 @@ impl PaymentRecord {
         return field.parse().unwrap();
     }
 }
+
+/*
+pub struct ItpReport {
+    #[serde(rename = "Iniciador")]
+    pub initiator_institution: String,
+    #[serde(rename = "Detentora")]
+    pub account_holder_institution: String,
+    #[serde(rename = "API")]
+    pub api: String,
+    #[serde(rename = "Endpoint")]
+    pub endpoint_description: String,
+    #[serde(rename = "Método")]
+    pub http_method: String,
+    #[serde(rename = "Status")]
+    pub http_status: i16,
+    #[serde(rename = "Quantidade")]
+    pub quantity: i32,
+    #[serde(rename = "Versão da API")]
+    pub api_version: String,
+    #[serde(rename = "OrganizationId Iniciador")]
+    pub initiator_organization_id: String,
+    #[serde(rename = "OrganizationId Detentor")]
+    pub account_holder_organization_id: String,
+    #[serde(rename = "ParentOrganizationReference Detentor")]
+    pub account_holder_parent_organization_document: String,
+    #[serde(rename = "URI do endpoint")]
+    pub endpoint_uri: String
+}
+ */
