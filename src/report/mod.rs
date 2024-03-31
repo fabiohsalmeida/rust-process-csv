@@ -1,18 +1,18 @@
-use crate::payment_record::PaymentRecord;
+use crate::mapped_record::MappedRecord;
 use crate::provider::Institution;
 
+pub const API_CONSENT: &str = "consents";
+pub const API_PAYMENTS: &str = "payments";
+pub const HTTP_METHOD_GET: &str = "GET";
+pub const HTTP_METHOD_POST: &str = "POST";
+pub const HTTP_METHOD_PATCH: &str = "PATCH";
 const INITIATOR_INSTITUTION_NAME: &str = "PicPay";
 const INITIATOR_ORGANIZATION_ID: &str = "c0f47d95-78e7-5f20-b0ea-ff8a75a44a76";
-const API_CONSENT: &str = "consents";
-const API_PAYMENTS: &str = "payments";
 const GET_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Consultar iniciação de pagamento";
 const POST_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Consultar iniciação de pagamento";
 const PATCH_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Cancelar iniciação de pagamento";
 const GET_CONSENT_ENDPOINT_DESCRIPTION: &str = "Consultar consentimento para iniciação de pagamento";
 const POST_CONSENT_ENDPOINT_DESCRIPTION: &str = "Criar consentimento para iniciação de pagamento";
-pub const HTTP_METHOD_GET: &str = "GET";
-pub const HTTP_METHOD_POST: &str = "POST";
-pub const HTTP_METHOD_PATCH: &str = "PATCH";
 const EMPTY: &str = "";
 
 #[derive(serde::Serialize)]
@@ -46,19 +46,20 @@ pub struct ItpReport {
 impl ItpReport {
 
     pub fn new(
-        payment: PaymentRecord,
+        api: &str,
+        payment: MappedRecord,
         institution: &Institution
     ) -> ItpReport {
         let payment_http_method: &str = payment.http_method.as_ref();
         let endpoint_description = Self::get_endpoint_description(
-            API_PAYMENTS.to_string(),
+            api.to_string(),
             payment_http_method.to_string()
         );
 
         ItpReport {
             initiator_institution: INITIATOR_INSTITUTION_NAME.to_string(),
             account_holder_institution: institution.main_institution_nice_name.to_string(),
-            api: API_PAYMENTS.to_string(),
+            api: api.to_string(),
             endpoint_description,
             http_method: payment_http_method.to_string(),
             http_status: payment.http_status_code,
@@ -69,6 +70,10 @@ impl ItpReport {
             account_holder_parent_organization_document: institution.organization_parent_document.to_string(),
             endpoint_uri: payment.http_path,
         }
+    }
+
+    fn add_to_quantity(&mut self, quantity: i32) {
+        self.quantity += quantity
     }
 
     fn get_endpoint_description(api: String, http_method: String) -> String {

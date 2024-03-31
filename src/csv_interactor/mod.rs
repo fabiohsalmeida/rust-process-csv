@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use csv::Writer;
 
-use crate::payment_record::PaymentRecord;
+use crate::mapped_record::MappedRecord;
 use crate::provider::Institution;
 use crate::report::{HTTP_METHOD_GET, HTTP_METHOD_PATCH, HTTP_METHOD_POST, ItpReport};
 
@@ -15,34 +15,36 @@ const ALLOWED_POST_STATUS: [i16; 15] = [200, 201, 400, 401, 403, 404, 405, 406, 
 const ALLOWED_PATCH_STATUS: [i16; 14] = [200, 201, 400, 401, 403, 404, 405, 406, 422, 429, 500,
     502, 503, 529];
 
-pub(crate) fn read_csv_payments_input(filename: &str) -> Vec<PaymentRecord> {
+pub(crate) fn read_csv(api: &str, filename: &str) -> Vec<MappedRecord> {
     let reader = csv::Reader::from_path(filename);
-    let mut payment_inputs: Vec<PaymentRecord> = Vec::new();
+    let mut inputs: Vec<MappedRecord> = Vec::new();
     let mut number_of_records_removed = 0;
 
     for record in reader.unwrap().records() {
         let record = record.unwrap();
-        let payment_record = PaymentRecord::new(record);
+        let mapped_record = MappedRecord::new(record);
 
-        if is_status_allowed(&payment_record.http_method, payment_record.http_status_code) {
-            payment_inputs.push(payment_record);
+        if is_status_allowed(&mapped_record.http_method, mapped_record.http_status_code) {
+            inputs.push(mapped_record);
         } else {
             number_of_records_removed += 1;
         };
     };
 
     println!(
-        "Number of Payments from input in {}: {}",
+        "Number of {} from input in {}: {}",
+        api,
         filename,
-        payment_inputs.len()
+        inputs.len()
     );
 
     println!(
-        "Number of records removed in payments: {}",
+        "Number of records removed in {}: {}",
+        api,
         number_of_records_removed
     );
 
-    payment_inputs
+    inputs
 }
 
 fn is_status_allowed(method: &String, status: i16) -> bool {

@@ -1,7 +1,7 @@
 use csv::StringRecord;
 
 #[derive(Debug)]
-pub struct PaymentRecord {
+pub struct MappedRecord {
     pub time: String,
     pub api_version: String,
     pub http_host: String,
@@ -12,11 +12,11 @@ pub struct PaymentRecord {
     pub quantity: i32
 }
 
-impl PaymentRecord {
+impl MappedRecord {
     pub fn new(
         record: StringRecord
-    ) -> PaymentRecord {
-        PaymentRecord {
+    ) -> MappedRecord {
+        MappedRecord {
             time: (&record[0]).parse().unwrap(),
             api_version: (&record[1]).parse().unwrap(),
             http_host: (&record[2]).parse().unwrap(),
