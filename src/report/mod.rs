@@ -14,6 +14,8 @@ const PATCH_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Cancelar iniciação de 
 const GET_CONSENT_ENDPOINT_DESCRIPTION: &str = "Consultar consentimento para iniciação de pagamento";
 const POST_CONSENT_ENDPOINT_DESCRIPTION: &str = "Criar consentimento para iniciação de pagamento";
 const EMPTY: &str = "";
+const ENDPOINT_FAMILIES: [&str; 4] = ["IMEDIATO", "AGENDAMENTO", "AGENDAMENTO RECORRENTE", "TRANSFERENCIAS \
+INTELIGENTES"];
 
 #[derive(serde::Serialize, Clone)]
 pub struct ItpReportRecord {
@@ -40,11 +42,14 @@ pub struct ItpReportRecord {
     #[serde(rename = "ParentOrganizationReference Detentor")]
     pub account_holder_parent_organization_document: String,
     #[serde(rename = "URI do endpoint")]
-    pub endpoint_uri: String
+    pub endpoint_uri: String,
+    #[serde(rename = "Tipo")]
+    pub endpoint_family: String
 }
 
 impl ItpReportRecord {
 
+    // TODO create logic to endpoint_family
     pub fn new(
         api: &str,
         payment: MappedInputRecord,
@@ -69,6 +74,7 @@ impl ItpReportRecord {
             account_holder_organization_id: institution.organization_id.to_string(),
             account_holder_parent_organization_document: institution.organization_parent_document.to_string(),
             endpoint_uri: payment.http_path,
+            endpoint_family: ENDPOINT_FAMILIES[0].to_string()
         }
     }
 
@@ -86,6 +92,7 @@ impl ItpReportRecord {
             account_holder_organization_id: from.account_holder_organization_id.to_string(),
             account_holder_parent_organization_document: from.account_holder_parent_organization_document.to_string(),
             endpoint_uri: from.endpoint_uri.to_string(),
+            endpoint_family: from.endpoint_family.to_string()
         }
     }
 
@@ -103,6 +110,7 @@ impl ItpReportRecord {
             account_holder_organization_id: from.account_holder_organization_id.to_string(),
             account_holder_parent_organization_document: from.account_holder_parent_organization_document.to_string(),
             endpoint_uri: from.endpoint_uri.to_string(),
+            endpoint_family: from.endpoint_family.to_string()
         }
     }
 
