@@ -10,9 +10,9 @@ const POST_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Consultar iniciação de 
 const PATCH_PAYMENT_ENDPOINT_DESCRIPTION: &str = "Pix - Cancelar iniciação de pagamento";
 const GET_CONSENT_ENDPOINT_DESCRIPTION: &str = "Consultar consentimento para iniciação de pagamento";
 const POST_CONSENT_ENDPOINT_DESCRIPTION: &str = "Criar consentimento para iniciação de pagamento";
-const HTTP_METHOD_GET: &str = "GET";
-const HTTP_METHOD_POST: &str = "POST";
-const HTTP_METHOD_PATCH: &str = "PATCH";
+pub const HTTP_METHOD_GET: &str = "GET";
+pub const HTTP_METHOD_POST: &str = "POST";
+pub const HTTP_METHOD_PATCH: &str = "PATCH";
 const EMPTY: &str = "";
 
 #[derive(serde::Serialize)]
@@ -72,7 +72,7 @@ impl ItpReport {
     }
 
     fn get_endpoint_description(api: String, http_method: String) -> String {
-        let mut endpoint_description: String = String::from("");
+        let mut endpoint_description: String = EMPTY.to_string();
 
         if api.eq(&API_CONSENT.to_string()) {
             if http_method.eq(&HTTP_METHOD_GET.to_string()) {
