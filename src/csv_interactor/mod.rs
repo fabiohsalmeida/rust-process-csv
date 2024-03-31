@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use csv::Writer;
 
-use crate::mapped_record::MappedRecord;
+use crate::mapped_record::MappedInputRecord;
 use crate::provider::Institution;
-use crate::report::{HTTP_METHOD_GET, HTTP_METHOD_PATCH, HTTP_METHOD_POST, ItpReport};
+use crate::report::{HTTP_METHOD_GET, HTTP_METHOD_PATCH, HTTP_METHOD_POST, ItpReportRecord};
 
 pub const PROVIDER_LIST_PATH_FILE: &str = "list_providers.csv";
 
@@ -15,14 +15,15 @@ const ALLOWED_POST_STATUS: [i16; 15] = [200, 201, 400, 401, 403, 404, 405, 406, 
 const ALLOWED_PATCH_STATUS: [i16; 14] = [200, 201, 400, 401, 403, 404, 405, 406, 422, 429, 500,
     502, 503, 529];
 
-pub(crate) fn read_csv(api: &str, filename: &str) -> Vec<MappedRecord> {
+pub(crate) fn read_csv(api: &str, filename: &str) -> Vec<MappedInputRecord> {
+    println!("---- Processing {}", api);
     let reader = csv::Reader::from_path(filename);
-    let mut inputs: Vec<MappedRecord> = Vec::new();
+    let mut inputs: Vec<MappedInputRecord> = Vec::new();
     let mut number_of_records_removed = 0;
 
     for record in reader.unwrap().records() {
         let record = record.unwrap();
-        let mapped_record = MappedRecord::new(record);
+        let mapped_record = MappedInputRecord::new(record);
 
         if is_status_allowed(&mapped_record.http_method, mapped_record.http_status_code) {
             inputs.push(mapped_record);
@@ -32,14 +33,15 @@ pub(crate) fn read_csv(api: &str, filename: &str) -> Vec<MappedRecord> {
     };
 
     println!(
-        "Number of {} from input in {}: {}",
+        "Accepted {} of {} {} from input in {}",
+        inputs.len(),
+        inputs.len() + number_of_records_removed,
         api,
-        filename,
-        inputs.len()
+        filename
     );
 
     println!(
-        "Number of records removed in {}: {}",
+        "Number of records removed in {} after filtering allowed status: {}",
         api,
         number_of_records_removed
     );
@@ -66,6 +68,7 @@ fn is_patch_status_allowed(method: &String, status: i16) -> bool {
 }
 
 pub(crate) fn load_institutions() -> HashMap<String, Institution> {
+    println!("\n------- Loading datasets");
     let reader = csv::Reader::from_path(PROVIDER_LIST_PATH_FILE);
     let mut institutions = HashMap::new();
 
@@ -88,10 +91,10 @@ pub(crate) fn load_institutions() -> HashMap<String, Institution> {
     institutions
 }
 
-pub(crate) fn write_report_to_csv(report_list: Vec<ItpReport>) {
+pub(crate) fn write_report_to_csv(report_map: HashMap<String, ItpReportRecord>) {
     let mut wtr = Writer::from_path("itp_report.csv").unwrap();
 
-    for report in report_list {
+    for report in report_map.values() {
         wtr.serialize(report).expect("Something went wrong in the serialization to report");
     }
 

@@ -1,4 +1,4 @@
-use crate::mapped_record::MappedRecord;
+use crate::mapped_record::MappedInputRecord;
 use crate::provider::Institution;
 
 pub const API_CONSENT: &str = "consents";
@@ -15,8 +15,8 @@ const GET_CONSENT_ENDPOINT_DESCRIPTION: &str = "Consultar consentimento para ini
 const POST_CONSENT_ENDPOINT_DESCRIPTION: &str = "Criar consentimento para iniciação de pagamento";
 const EMPTY: &str = "";
 
-#[derive(serde::Serialize)]
-pub struct ItpReport {
+#[derive(serde::Serialize, Clone)]
+pub struct ItpReportRecord {
     #[serde(rename = "Iniciador")]
     pub initiator_institution: String,
     #[serde(rename = "Detentora")]
@@ -43,20 +43,20 @@ pub struct ItpReport {
     pub endpoint_uri: String
 }
 
-impl ItpReport {
+impl ItpReportRecord {
 
     pub fn new(
         api: &str,
-        payment: MappedRecord,
+        payment: MappedInputRecord,
         institution: &Institution
-    ) -> ItpReport {
+    ) -> ItpReportRecord {
         let payment_http_method: &str = payment.http_method.as_ref();
         let endpoint_description = Self::get_endpoint_description(
             api.to_string(),
             payment_http_method.to_string()
         );
 
-        ItpReport {
+        ItpReportRecord {
             initiator_institution: INITIATOR_INSTITUTION_NAME.to_string(),
             account_holder_institution: institution.main_institution_nice_name.to_string(),
             api: api.to_string(),
@@ -72,8 +72,38 @@ impl ItpReport {
         }
     }
 
-    fn add_to_quantity(&mut self, quantity: i32) {
-        self.quantity += quantity
+    pub fn clone_and_add_to_quantity(from: ItpReportRecord, quantity: i32) -> ItpReportRecord {
+        ItpReportRecord {
+            initiator_institution: from.initiator_institution.to_string(),
+            account_holder_institution: from.account_holder_institution.to_string(),
+            api: from.api.to_string(),
+            endpoint_description: from.endpoint_description.to_string(),
+            http_method: from.http_method.to_string(),
+            http_status: from.http_status,
+            quantity: from.quantity + quantity,
+            api_version: from.api_version.to_string(),
+            initiator_organization_id: from.initiator_organization_id.to_string(),
+            account_holder_organization_id: from.account_holder_organization_id.to_string(),
+            account_holder_parent_organization_document: from.account_holder_parent_organization_document.to_string(),
+            endpoint_uri: from.endpoint_uri.to_string(),
+        }
+    }
+
+    pub fn clone_from(from: &ItpReportRecord) -> ItpReportRecord {
+        ItpReportRecord {
+            initiator_institution: from.initiator_institution.to_string(),
+            account_holder_institution: from.account_holder_institution.to_string(),
+            api: from.api.to_string(),
+            endpoint_description: from.endpoint_description.to_string(),
+            http_method: from.http_method.to_string(),
+            http_status: from.http_status,
+            quantity: from.quantity,
+            api_version: from.api_version.to_string(),
+            initiator_organization_id: from.initiator_organization_id.to_string(),
+            account_holder_organization_id: from.account_holder_organization_id.to_string(),
+            account_holder_parent_organization_document: from.account_holder_parent_organization_document.to_string(),
+            endpoint_uri: from.endpoint_uri.to_string(),
+        }
     }
 
     fn get_endpoint_description(api: String, http_method: String) -> String {
