@@ -18,7 +18,7 @@ impl MappedInputRecord {
     ) -> MappedInputRecord {
         MappedInputRecord {
             time: (&record[0]).parse().unwrap(),
-            api_version: (&record[1]).parse().unwrap(),
+            api_version: Self::get_version(&record[1]),
             http_host: (&record[2]).parse().unwrap(),
             http_method: (&record[3]).parse().unwrap(),
             http_path: (&record[4]).parse().unwrap(),
@@ -36,6 +36,19 @@ impl MappedInputRecord {
 
         if field.contains(pattern) {
             return field.replace(pattern, to_empty).trim().parse().unwrap();
+        }
+
+        return field.parse().unwrap();
+    }
+
+    fn get_version(
+        field: &str
+    ) -> String {
+        let pattern = "3.0.0";
+        let to_pattern = "v3";
+
+        if field.contains(pattern) {
+            return field.replace(pattern, to_pattern).trim().parse().unwrap();
         }
 
         return field.parse().unwrap();
